@@ -15,10 +15,11 @@ import numpy as np
 
 
 # Load data
-input_dir = "C:\\Users\\charl\\Downloads\\Compressed\\images\\train"
+train_dir = "C:\\Users\\charl\\Downloads\\Compressed\\images\\train"
+test_dir = "C:\\Users\\charl\\Downloads\\Compressed\\images\\test"
 categories = ['Bear', 'Brown bear', 'Bull', 'Butterfly', 'Camel', 'Canary', 'Caterpillar', 'Cattle', 'Centipede',
               'Cheetah', 'Chicken', 'Crab', 'Crocodile', 'Deer', 'Duck', 'Eagle', 'Elephant', 'Fish', 'Fox',
-              'Frog', 'Giraffe', 'Goat', 'Goldfish', 'Goose', 'Hamster', 'HarborSeal', 'Hedgehog', 'Hippopotamus',
+              'Frog', 'Giraffe', 'Goat', 'Goldfish', 'Goose', 'Hamster', 'Harbor Seal', 'Hedgehog', 'Hippopotamus',
               'Horse', 'Jaguar', 'Jellyfish', 'Kangaroo', 'Koala', 'Ladybug', 'Leopard', 'Lion', 'Lizard',
               'Lynx', 'Magpie', 'Monkey', 'Moths and butterflies', 'Mouse', 'Mule', 'Ostrich', 'Otter', 'Owl',
               'Panda', 'Parrot', 'Penguin', 'Pig', 'Polar bear', 'Rabbit', 'Raccoon', 'Raven', 'Red panda',
@@ -30,7 +31,7 @@ data = []
 labels = []
 
 for category in categories:
-    category_path = os.path.join(input_dir, category)
+    category_path = os.path.join(train_dir, category)
     for file in os.listdir(category_path):
         img_path = os.path.join(category_path, file)
         img = load_img(img_path, target_size=(224, 224))
