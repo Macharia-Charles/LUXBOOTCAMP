@@ -1,6 +1,6 @@
-Week6\fastapiDockerization\dockerfastapi\
-Week6\fastapiDockerization\__pycache__\
-Week6\flaskDockerization\dockerflask\
-finalProject\animals-detection-images-dataset\train\
-finalProject\animals-detection-images-dataset\test\
-.idea\
+/Week6/fastapiDockerization/dockerfastapi/
+/Week6/fastapiDockerization/__pycache__/
+/Week6/flaskDockerization/dockerflask/
+/finalProject/animals-detection-images-dataset/train/
+/finalProject/animals-detection-images-dataset/test/
+.idea/
