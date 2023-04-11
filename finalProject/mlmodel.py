@@ -3,7 +3,7 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from keras.preprocessing.image import ImageDataGenerator
-from keras.utils import to_categorical, load_img, img_to_array
+from keras.utils import load_img, img_to_array
 from keras.applications.vgg16 import VGG16
 from keras.layers import Dense, Flatten
 from keras.models import Model
@@ -39,10 +39,9 @@ for category in categories:
         data.append(img)
         labels.append(category)
 
-data = np.asarray(data)
+
 labels = np.asarray(labels)
 
-labels = to_categorical(labels)
 
 # Split data
 train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.2, shuffle=True,
