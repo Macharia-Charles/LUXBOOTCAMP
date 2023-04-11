@@ -15,8 +15,8 @@ import numpy as np
 
 
 # Load data
-train_dir = "C:\\Users\\charl\\Downloads\\Compressed\\images\\train"
-test_dir = "C:\\Users\\charl\\Downloads\\Compressed\\images\\test"
+train_dir = './animals-detection-images-dataset/train'
+test_dir = "./animals-detection-images-dataset/test"
 categories = ['Bear', 'Brown bear', 'Bull', 'Butterfly', 'Camel', 'Canary', 'Caterpillar', 'Cattle', 'Centipede',
               'Cheetah', 'Chicken', 'Crab', 'Crocodile', 'Deer', 'Duck', 'Eagle', 'Elephant', 'Fish', 'Fox',
               'Frog', 'Giraffe', 'Goat', 'Goldfish', 'Goose', 'Hamster', 'Harbor Seal', 'Hedgehog', 'Hippopotamus',
