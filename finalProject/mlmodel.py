@@ -49,7 +49,7 @@ train_data, test_data, train_labels, test_labels = train_test_split(data, labels
 
 
 # Load the pre-trained model and add a classifier on top of the base model
-base_model = VGG16(weights='imagenets', include_top=False,
+base_model = VGG16(weights=None, include_top=False,
                    input_shape=(224, 224, 3))
 data = base_model.output
 data = Flatten()(data)
