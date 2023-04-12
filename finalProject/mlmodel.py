@@ -55,8 +55,8 @@ plt.legend()
 plt.show()
 
 # Save the model
-model.save('Animals_prediction_model.h5')
+model.save('./Animals_prediction_model.h5')
 weights = model.get_weights()
-dump(weights, 'Animals_prediction_model.joblib')
-with open('Animals_prediction_model.pkl', 'wb') as f:
+dump(weights, './Animals_prediction_model.joblib')
+with open('./Animals_prediction_model.pkl', 'wb') as f:
     pickle.dump(weights, f)
