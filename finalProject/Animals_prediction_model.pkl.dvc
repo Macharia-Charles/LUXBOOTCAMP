@@ -1,0 +1,4 @@
+outs:
+- md5: d055bb2bbac29f78c063dd21a732ab6f
+  size: 38882168
+  path: Animals_prediction_model.pkl

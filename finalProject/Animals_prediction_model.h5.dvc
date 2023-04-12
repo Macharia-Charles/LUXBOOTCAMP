@@ -1,0 +1,4 @@
+outs:
+- md5: 3aaf0c577e7e063984a92baf15fbc946
+  size: 116733328
+  path: Animals_prediction_model.h5
