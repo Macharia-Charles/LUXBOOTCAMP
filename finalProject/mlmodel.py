@@ -10,6 +10,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+
 # CNN model
 model = Sequential([
     Conv2D(16, (3, 3), activation="relu", input_shape=(224, 224, 3)),
@@ -30,7 +32,7 @@ model.add(Dense(80, activation="softmax"))
 # Define parameters and callbacks
 adam = Adam(learning_rate=0.001)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'], run_eagerly=True)
-bs = 50
+bs = 250
 train_dir = './animals-detection-images-dataset/train'
 test_dir = "./animals-detection-images-dataset/test"
 train_datagen = ImageDataGenerator(rescale=1.0/255.)
@@ -45,18 +47,41 @@ history = model.fit(train_generator,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples // bs)
 
-
-# Evaluate the model
-plt.plot(history.history['loss'], label='train_loss')
-plt.plot(history.history['val_loss'], label='val_loss')
-plt.plot(history.history['accuracy'], label='train_acc')
-plt.plot(history.history['val_accuracy'], label='val_acc')
-plt.legend()
-plt.show()
-
 # Save the model
 model.save('./Animals_prediction_model.h5')
 weights = model.get_weights()
 dump(weights, './Animals_prediction_model.joblib')
 with open('./Animals_prediction_model.pkl', 'wb') as f:
     pickle.dump(weights, f)
+
+
+# Evaluate the model on the test set
+test_loss, test_acc = model.evaluate(validation_generator)
+
+# Print the test loss and accuracy
+print('Test loss:', test_loss)
+print('Test accuracy:', test_acc)
+
+train_loss = history.history['loss']
+val_loss = history.history['val_loss']
+epochs = range(1, len(train_loss) + 1)
+
+plt.plot(epochs, train_loss, 'bo', label='Training loss')
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
+
+# Plot the training and validation accuracy over epochs
+train_acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+
+plt.plot(epochs, train_acc, 'bo', label='Training accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
