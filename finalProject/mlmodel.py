@@ -30,7 +30,7 @@ model.add(Dense(80, activation="softmax"))
 # Define parameters and callbacks
 adam = Adam(learning_rate=0.001)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'], run_eagerly=True)
-bs = 30
+bs = 50
 train_dir = './animals-detection-images-dataset/train'
 test_dir = "./animals-detection-images-dataset/test"
 train_datagen = ImageDataGenerator(rescale=1.0/255.)
@@ -41,7 +41,7 @@ validation_generator = test_datagen.flow_from_directory(test_dir, batch_size=bs,
 # Train and fit the model
 history = model.fit(train_generator,
                               steps_per_epoch=train_generator.samples // bs,
-                              epochs=50,
+                              epochs=15,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples // bs)
 
