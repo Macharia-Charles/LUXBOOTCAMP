@@ -1,112 +1,91 @@
+# Import required libraries
+
 import os
-
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from keras.preprocessing.image import ImageDataGenerator
-from keras.utils import to_categorical, load_img, img_to_array
-from keras.applications.vgg16 import VGG16
-from keras.layers import Dense, Flatten
-from keras.models import Model
-from keras.callbacks import EarlyStopping, LearningRateScheduler
-from keras.optimizers import SGD
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from keras.optimizers import Adam
 from joblib import dump
-
 import numpy as np
+import matplotlib.pyplot as plt
+import pickle
+
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+
+# CNN model
+model = Sequential([
+    Conv2D(16, (3, 3), activation="relu", input_shape=(224, 224, 3)),
+    MaxPooling2D(2, 2),
+    Conv2D(32, (3, 3), activation="relu"),
+    MaxPooling2D(2, 2),
+    Conv2D(64, (3, 3), activation="relu"),
+    MaxPooling2D(2, 2),
+    Conv2D(128, (3, 3), activation="relu"),
+    MaxPooling2D(2, 2),
+    Conv2D(256, (3, 3), activation="relu"),
+    MaxPooling2D(2, 2)
+    ])
+model.add(Flatten())
+model.add(Dense(100, activation="relu"))
+model.add(Dense(80, activation="softmax"))
 
 
-# Load data
-input_dir = "C:\\Users\\charl\\Downloads\\Compressed\\images\\train"
-categories = ['Bear', 'Brown bear', 'Bull', 'Butterfly', 'Camel', 'Canary', 'Caterpillar', 'Cattle', 'Centipede',
-              'Cheetah', 'Chicken', 'Crab', 'Crocodile', 'Deer', 'Duck', 'Eagle', 'Elephant', 'Fish', 'Fox',
-              'Frog', 'Giraffe', 'Goat', 'Goldfish', 'Goose', 'Hamster', 'HarborSeal', 'Hedgehog', 'Hippopotamus',
-              'Horse', 'Jaguar', 'Jellyfish', 'Kangaroo', 'Koala', 'Ladybug', 'Leopard', 'Lion', 'Lizard',
-              'Lynx', 'Magpie', 'Monkey', 'Moths and butterflies', 'Mouse', 'Mule', 'Ostrich', 'Otter', 'Owl',
-              'Panda', 'Parrot', 'Penguin', 'Pig', 'Polar bear', 'Rabbit', 'Raccoon', 'Raven', 'Red panda',
-              'Rhinoceros', 'Scorpion', 'Sea lion', 'Sea turtle', 'Seahorse', 'Shark', 'Sheep', 'Shrimp',
-              'Snail', 'Snake', 'Sparrow', 'Spider', 'Squid', 'Squirrel', 'Starfish', 'Swan', 'Tick', 'Tiger',
-              'Tortoise', 'Turkey', 'Turtle', 'Whale', 'Woodpecker', 'Worm', 'Zebra']
 
-data = []
-labels = []
+model.summary()
 
-for category in categories:
-    category_path = os.path.join(input_dir, category)
-    for file in os.listdir(category_path):
-        img_path = os.path.join(category_path, file)
-        img = load_img(img_path, target_size=(224, 224))
-        img = img_to_array(img)
-        data.append(img)
-        labels.append(category)
+# Define parameters and callbacks
+adam = Adam(learning_rate=0.003)
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'], run_eagerly=True)
+bs = 100
+train_dir = './animals-detection-images-dataset/train'
+test_dir = "./animals-detection-images-dataset/test"
+train_datagen = ImageDataGenerator(rescale=1.0/255.)
+test_datagen = ImageDataGenerator(rescale=1.0/255.)
+train_generator = train_datagen.flow_from_directory(train_dir, batch_size=bs, class_mode='categorical', target_size=(224, 224), shuffle=True)
+validation_generator = test_datagen.flow_from_directory(test_dir, batch_size=bs, class_mode='categorical', target_size=(224, 224), shuffle=True)
 
-data = np.asarray(data)
-labels = np.asarray(labels)
+# Train and fit the model
+history = model.fit(train_generator,
+                              steps_per_epoch=train_generator.samples // bs,
+                              epochs=13,
+                              validation_data=validation_generator,
+                              validation_steps=validation_generator.samples // bs)
 
-labels = to_categorical(labels)
-
-# Split data
-train_data, test_data, train_labels, test_labels = train_test_split(data, labels, test_size=0.2, shuffle=True,
-                                                                    stratify=labels)
+# Save the model
+model.save('./Animals_prediction_model.h5')
+weights = model.get_weights()
+dump(weights, './Animals_prediction_model.joblib')
+with open('./Animals_prediction_model.pkl', 'wb') as f:
+    pickle.dump(weights, f)
 
 
-# Load the pre-trained model and add a classifier on top of the base model
-base_model = VGG16(weights='imagenets', include_top=False,
-                   input_shape=(224, 224, 3))
-data = base_model.output
-data = Flatten()(data)
-data = Dense(256, activation='relu')(data)
-data = Dense(len(categories), activation='softmax')(data)
+# Evaluate the model on the test set
+test_loss, test_acc = model.evaluate(validation_generator)
 
-for layer in base_model.layers:
-    layer.trainable = False
+# Print the test loss and accuracy
+print('Test loss:', test_loss)
+print('Test accuracy:', test_acc)
 
-model = Model(inputs=base_model.input, outputs=data)
+train_loss = history.history['loss']
+val_loss = history.history['val_loss']
+epochs = range(1, len(train_loss) + 1)
 
+plt.plot(epochs, train_loss, 'bo', label='Training loss')
+plt.plot(epochs, val_loss, 'b', label='Validation loss')
+plt.title('Training and validation loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.show()
 
-# Define training parameters
-batch_size = 32
-epochs = 50
-learningRate = 1e-4
+# Plot the training and validation accuracy over epochs
+train_acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
 
-trainDataGenerator = ImageDataGenerator(rotation_range=20, width_shift_range=0.2, height_shift_range=0.2,
-                                        shear_range=0.2, zoom_range=0.2, horizontal_flip=True,
-                                        fill_mode='nearest')
-
-model.compile(loss='categorical_crossentropy', optimizer=SGD(learning_rate=learningRate, momentum=0.9),
-              metrics=['accuracy'])
-
-# Defining the callbacks
-early_stopping = EarlyStopping(
-    monitor='val_loss', patience=5, restore_best_weights=True)
-
-
-def lr_schedule(epoch):
-    if epoch < 10:
-        return learningRate
-    else:
-        return learningRate * np.exp(-0.1)
-
-
-lr_scheduler = LearningRateScheduler(lr_schedule)
-
-history = model.fit(trainDataGenerator.flow(train_data, train_labels, batch_size=batch_size), epochs=epochs,
-                    steps_per_epoch=train_data.shape[0] // batch_size, validation_data=(test_data, test_labels),
-                    callbacks=[early_stopping, lr_scheduler])
-
-# Evaluate model
-label_pred = model.predict(test_data)
-label_pred = np.argmax(label_pred, axis=1)
-label_true = np.argmax(test_labels, axis=1)
-
-accuracy = accuracy_score(label_true, label_pred)
-precision = precision_score(label_true, label_pred, average='weighted')
-recall = recall_score(label_true, label_pred, average='weighted')
-f1 = f1_score(label_true, label_pred, average='weighted')
-
-print('Accuracy: {:.2f}%, Precision: {:.2f}%, Recall: {:.2f}%, F1 Score: {:.2f}%'.format(accuracy * 100,
-                                                                                         precision * 100,
-                                                                                         recall * 100,
-                                                                                         f1 * 100))
-
-
-# Save model
-dump(model, 'Animals_prediction_model.joblib')
+plt.plot(epochs, train_acc, 'bo', label='Training accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()

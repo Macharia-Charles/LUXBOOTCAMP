@@ -1,0 +1,5 @@
+outs:
+- md5: 6ded6fd4a2b37125d70aaf3b9d7ed14a.dir
+  size: 26819
+  nfiles: 3
+  path: predict

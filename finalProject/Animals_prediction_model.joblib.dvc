@@ -1,0 +1,4 @@
+outs:
+- md5: a136d84b72539a64a9fcf4a630cfcaf2
+  size: 38882272
+  path: Animals_prediction_model.joblib
