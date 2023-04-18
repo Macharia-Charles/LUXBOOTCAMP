@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import numpy as np
-import joblib
 import cv2
 from keras.models import load_model
 
