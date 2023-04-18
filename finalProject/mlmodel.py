@@ -34,7 +34,7 @@ model.add(Dense(80, activation="softmax"))
 model.summary()
 
 # Define parameters and callbacks
-adam = Adam(learning_rate=0.003)
+adam = Adam(learning_rate=0.001)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'], run_eagerly=True)
 bs = 30
 train_dir = "../images/train/"
