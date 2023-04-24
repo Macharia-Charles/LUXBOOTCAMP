@@ -14,7 +14,9 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
 # CNN model
 model = Sequential([
-    Conv2D(32, (3, 3), activation="relu", input_shape=(224, 224, 3)),
+    Conv2D(16, (3, 3), activation="relu", input_shape=(224, 224, 3)),
+    MaxPooling2D(2, 2),
+    Conv2D(32, (3, 3), activation="relu"),
     MaxPooling2D(2, 2),
     Conv2D(64, (3, 3), activation="relu"),
     MaxPooling2D(2, 2),
@@ -28,15 +30,12 @@ model = Sequential([
 model.add(Flatten())
 model.add(Dense(100, activation="relu"))
 model.add(Dense(80, activation="softmax"))
-
-
-
 model.summary()
 
 # Define parameters and callbacks
 adam = Adam(learning_rate=0.001)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'], run_eagerly=True)
-bs = 30
+bs = 50
 train_dir = "../images/train/"
 test_dir = "../images/test/"
 train_datagen = ImageDataGenerator(rescale=1.0/255.)
@@ -47,7 +46,7 @@ validation_generator = test_datagen.flow_from_directory(test_dir, batch_size=bs,
 # Train and fit the model
 history = model.fit(train_generator,
                               steps_per_epoch=train_generator.samples // bs,
-                              epochs=15,
+                              epochs=10,
                               validation_data=validation_generator,
                               validation_steps=validation_generator.samples // bs)
 
